@@ -9,16 +9,24 @@ const client = new pg.Client({
   port     : settings.port,
   ssl      : settings.ssl
 });
-let name = process.argv[2];
+
+const name = require('./by_name')(client);
+
 client.connect((err) => {
   if (err) {
     return console.error("Connection Error", err);
   }
-  client.query("SELECT * from famous_people where first_name = $1 or last_name = $1", [name], (err, result) => {
-    if (err) {
-      return console.error("error running query", err);
-    }
+  let target = process.argv[2];
+  name.searchByName(target,(err, result) => {
+    if(err) throw err;
     console.log(result.rows);
     client.end();
   });
+  // client.query("SELECT * from famous_people where first_name = $1 or last_name = $1", [name], (err, result) => {
+  //   if (err) {
+  //     return console.error("error running query", err);
+  //   }
+  //   console.log(result.rows);
+  //   client.end();
+  // });
 });
